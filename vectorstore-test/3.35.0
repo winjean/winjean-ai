@@ -1,0 +1,10 @@
+Collecting pysqlite3
+  Downloading pysqlite3-0.5.3.tar.gz (40 kB)
+     --------------------------------------- 40.8/40.8 kB 59.2 kB/s eta 0:00:00
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Building wheels for collected packages: pysqlite3
+  Building wheel for pysqlite3 (setup.py): started
+  Building wheel for pysqlite3 (setup.py): finished with status 'error'
+  Running setup.py clean for pysqlite3
+Failed to build pysqlite3
