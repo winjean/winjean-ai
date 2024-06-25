@@ -29,8 +29,8 @@ def ask_pdf():
 
 
 def main():
-    # read_pdf()
-    ask_pdf()
+    read_pdf()
+    # ask_pdf()
 
 
 if __name__ == '__main__':

@@ -8,6 +8,11 @@ from langchain.schema.runnable import RunnableMap, RunnableLambda, RunnableBranc
 from dotenv import load_dotenv, find_dotenv
 import openai
 import os
+from langchain.globals import set_llm_cache
+import getpass
+
+pwd = getpass.getpass()
+print(pwd)
 
 _ = load_dotenv(find_dotenv())
 openai.api_key = os.environ['OPENAI_API_KEY']
@@ -16,6 +21,7 @@ openai.temperature = 0.7
 
 
 def create_model(url="http://10.20.4.226:8000/v1") -> ChatOpenAI:
+    # set_llm_cache()
     return ChatOpenAI(model="qwen", temperature=1.0, base_url=url, api_key='test')
 
 
