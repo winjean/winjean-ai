@@ -6,6 +6,7 @@ from dotenv import load_dotenv, find_dotenv
 from datetime import datetime
 from langchain_core.tools import tool
 from langchain.tools.base import BaseTool
+from langchain.llms import Ollama
 
 
 load_dotenv(find_dotenv())
