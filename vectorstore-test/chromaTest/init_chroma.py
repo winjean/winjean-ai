@@ -1,20 +1,34 @@
 from langchain_openai import OpenAIEmbeddings
-from langchain.text_splitter import CharacterTextSplitter
+# from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.vectorstores import Chroma
-from langchain_community.document_loaders import PyPDFLoader
+# from langchain_community.embeddings.openai import OpenAIEmbeddings
+# from langchain_community.document_loaders import PyPDFLoader
+# from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
+# from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
+# from langchain_huggingface import HuggingFaceEmbeddings
+# from langchain_community.document_loaders import PyMuPDFLoader
 import os
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.document_loaders import TextLoader
-from chromadb.config import Settings
-import chromadb
-from chromadb.utils import embedding_functions
+from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import TextLoader
+# from chromadb.config import Settings
+# import chromadb
+# from chromadb.utils import embedding_functions
+from langchain.chains import RetrievalQA
+from langchain_openai import ChatOpenAI
+from dotenv import load_dotenv, find_dotenv
+# from transformers import AutoTokenizer, AutoModel
 
+load_dotenv(find_dotenv())
+persist_directory = "e://test/db"
+embeddings = OpenAIEmbeddings()
+# db = Chroma(persist_directory=persist_directory, embedding_function=embeddings)
 
-os.environ["OPENAI_API_KEY"] = "test"
-persist_directory = "e://db"
-client = chromadb.PersistentClient(path=persist_directory)
+# 加载模型和分词器
+# tokenizer = AutoTokenizer.from_pretrained("shibing624/text2vec-base-chinese")
+# model = AutoModel.from_pretrained("shibing624/text2vec-base-chinese")
 
-collection_name = "my_documents2"
+"""
+# client = chromadb.PersistentClient(path=persist_directory)
 # embedding_function = embedding_functions.DefaultEmbeddingFunction()
 
 # 实际创建集合
@@ -27,51 +41,72 @@ collection_name = "my_documents2"
 # # 将文档添加到集合中
 # collection.add(documents=documents, ids=ids, metadatas=metadatas)
 
-collection = client.get_collection(name=collection_name)
+# collection = client.get_collection(name=collection_name)
 
-query = "查找相关文档"
-results = collection.query(query_texts=[query], n_results=2)
-print(results)
-
+# query = "查找相关文档"
+# results = collection.query(query_texts=[query], n_results=2)
+# print(results)
 
 # for result in results:
     # print(f"查询结果: {result['documents'][0]}, 来源: {result['metadatas'][0]['source']}")
     # print(f"查询结果: {result['documents'][0]}")
 
-client = None
+# client = None
 # with open("e://remark.txt", "r", encoding="utf-8") as f:
 #     state_of_the_union = f.read()
 # text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
 # texts = text_splitter.split_text(state_of_the_union)
 
-# filePath = "E:/AI/6147.pdf"
-
+# filePath = "E:/test/aa.pdf"
 # loader = PyPDFLoader(file_path=filePath)
-# documents = loader.load()
-
-# embeddings = OpenAIEmbeddings()
-# Chroma.add_texts()
+# loader = PyMuPDFLoader(file_path=filePath)
 
 # 加载文档数据
-# filePath = "E:/remark.txt"
-# loader = TextLoader(filePath, encoding="utf-8")  # 替换为你的文件路径
-# documents = loader.load()
+loader = TextLoader(file_path=filePath, encoding="utf-8")  # 替换为你的文件路径
+# loader = PyMuPDFLoader(file_path=filePath)
+documents = loader.load()
 
 # 分割文档为小段落
-# text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-# docs = text_splitter.split_documents(documents)
+text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+docs = text_splitter.split_documents(documents)
 
+embeddings = OpenAIEmbeddings()
+# embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+# embedding_function = HuggingFaceEmbeddings()
+# embedding_function = SentenceTransformerEmbeddings(model_name="shibing624/text2vec-base-chinese")
+# Chroma.add_texts()
 
-# docsearch = Chroma.add_documents(documents=documents, embedding=embeddings, persist_directory="e://db")
+"""
 
-# metadatas=[{"source": f"Text chunk {i} of {len(texts)}"} for i in range(len(texts))],
-# db = Chroma.from_documents(
-#     documents=docs,
-#     embedding=embeddings,
-#     collection_name="winjean",
-#     persist_directory="e://db")
-# db.persist()
-# db = None
+filePath = "E:/test/aa.txt"
+loader = TextLoader(file_path=filePath, encoding="utf-8")
+documents = loader.load()
+
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+texts = text_splitter.split_documents(documents)
+
+collection_name = "winjean"
+
+try:
+    db = Chroma.from_documents(
+        documents=documents,
+        embedding=embeddings,
+        collection_name=collection_name,
+        persist_directory=persist_directory,
+    )
+except Exception as e:
+    print(f"Error connecting to Chroma: {e}")
+
+# db.delete_collection()
+
+# 创建检索问答链路
+retriever = db.as_retriever()
+qa_chain = RetrievalQA.from_chain_type(llm=ChatOpenAI(), retriever=retriever)
+
+# 查询问答系统
+query = "What's your name?"
+response = qa_chain.invoke(query)
+print(f"问题: {query}\n答案: {response}")
 
 if __name__ == '__main__':
     pass

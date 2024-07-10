@@ -7,12 +7,13 @@ os.environ["OPENAI_API_KEY"] = "test"
 
 embeddings = OpenAIEmbeddings()
 
-docsearch = Chroma(persist_directory="e://db", embedding_function=embeddings)
+docsearch = Chroma(
+    persist_directory="e://test/db",
+    embedding_function=embeddings,
+    collection_name="winjean",
+)
 
-docsearch.similarity_search("What's your name?", k=1)
-
-a = docsearch.similarity_search("", k=1)
-
+a = docsearch.similarity_search("What's your name?", k=1)
 print(a)
 
 chain = RetrievalQAWithSourcesChain.from_chain_type(OpenAI(temperature=0), chain_type="stuff", retriever=docsearch.as_retriever())
