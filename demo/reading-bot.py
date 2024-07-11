@@ -39,10 +39,10 @@ class ChatbotWithRetrieval:
 
         # 向量数据库
         self.vectorstore = Chroma.from_documents(
-            documents=all_splits, # 以分块的文档
-            embedding=OpenAIEmbeddings(), # 用OpenAI的Embedding Model做嵌入
+            documents=all_splits,  # 以分块的文档
+            embedding=OpenAIEmbeddings(),  # 用OpenAI的Embedding Model做嵌入
             persist_directory="e://db",  # in-memory 存储
-            collection_name="my_documents") # 指定collection_name
+            collection_name="my_documents")  # 指定collection_name
 
         # 初始化LLM
         self.llm = ChatOpenAI()

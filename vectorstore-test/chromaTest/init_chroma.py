@@ -2,11 +2,10 @@ from langchain_openai import OpenAIEmbeddings
 # from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.vectorstores import Chroma
 # from langchain_community.embeddings.openai import OpenAIEmbeddings
-# from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFLoader, PyMuPDFLoader
 # from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 # from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 # from langchain_huggingface import HuggingFaceEmbeddings
-# from langchain_community.document_loaders import PyMuPDFLoader
 import os
 from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import TextLoader
@@ -78,35 +77,65 @@ embeddings = OpenAIEmbeddings()
 
 """
 
-filePath = "E:/test/aa.txt"
-loader = TextLoader(file_path=filePath, encoding="utf-8")
-documents = loader.load()
-
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-texts = text_splitter.split_documents(documents)
-
 collection_name = "winjean"
 
-try:
-    db = Chroma.from_documents(
-        documents=documents,
-        embedding=embeddings,
-        collection_name=collection_name,
-        persist_directory=persist_directory,
-    )
-except Exception as e:
-    print(f"Error connecting to Chroma: {e}")
 
-# db.delete_collection()
+def save_to_chroma() -> Chroma:
+    filePath = "E:/test/LangChain.pdf"
+    loader = PyPDFLoader(file_path=filePath)
+    # loader = PyMuPDFLoader(file_path=filePath)
+    # filePath = "E:/test/aa.txt"
+    # loader = TextLoader(file_path=filePath, encoding="utf-8")
+    documents = loader.load()
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+    texts = text_splitter.split_documents(documents)
 
-# 创建检索问答链路
-retriever = db.as_retriever()
-qa_chain = RetrievalQA.from_chain_type(llm=ChatOpenAI(), retriever=retriever)
+    try:
+        db = Chroma.from_documents(
+            documents=documents,
+            embedding=embeddings,
+            collection_name=collection_name,
+            persist_directory=persist_directory,
+        )
+        # 创建检索问答链路
+        retriever = db.as_retriever()
+        qa_chain = RetrievalQA.from_chain_type(llm=ChatOpenAI(), retriever=retriever)
 
-# 查询问答系统
-query = "What's your name?"
-response = qa_chain.invoke(query)
-print(f"问题: {query}\n答案: {response}")
+        # 查询问答系统
+        query = "什么叫链?"
+        response = qa_chain.invoke(query)
+        print(f"问题: {query}\n答案: {response}")
+    except Exception as e:
+        print(f"Error connecting to Chroma: {e}")
+
+
+def delete_chroma():
+    db = Chroma(persist_directory=persist_directory, embedding_function=embeddings, collection_name=collection_name)
+    db.delete_collection()
+
+
+def find_chroma():
+    db = Chroma(persist_directory=persist_directory, embedding_function=embeddings, collection_name=collection_name)
+    retriever = db.as_retriever()
+    qa_chain = RetrievalQA.from_chain_type(llm=ChatOpenAI(), retriever=retriever)
+
+    # 查询问答系统
+    query = "什么是langchain链?"
+    response = qa_chain.invoke(query)
+    print(f"问题: {query}\n答案: {response}")
+
+    query = "什么叫链?"
+    docs = db.similarity_search(query)
+
+    # Print results
+    for doc in docs:
+        print(doc.page_content)
+
 
 if __name__ == '__main__':
-    pass
+    print("--- start save ---")
+    # save_to_chroma()
+    print("--- start find ---")
+    # find_chroma()
+    print("--- start delete ---")
+    delete_chroma()
