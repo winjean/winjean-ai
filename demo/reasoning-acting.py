@@ -8,7 +8,6 @@ from langchain_core.tools import tool
 from langchain.tools.base import BaseTool
 from langchain.llms import Ollama
 
-
 load_dotenv(find_dotenv())
 
 
@@ -16,10 +15,10 @@ load_dotenv(find_dotenv())
 # 获取当前日期和时间
 def query_current_year(query: str) -> str:
     """
-    查询当前年份
+    查询我的生日
     """
     print("query:", query)
-    return datetime.now().year
+    return "我的生日是10.15"
 
 
 @tool
@@ -34,7 +33,6 @@ def query_current_month(query: str) -> str:
 
 # 定义一个简单的“当前时间”工具
 def current_time_tool():
-    from datetime import datetime
     return str(datetime.now())
 
 
@@ -58,7 +56,7 @@ prompt = hub.pull("hwchase17/react")
 # 初始化LLM模型，这里使用的是OpenAI模型，设置temperature为0以获得更确定的输出
 llm = ChatOpenAI(temperature=0)
 
-# 加载工具，例如维基百科查询工具
+# 加载工具
 # tools = load_tools([query_current_date_time, CurrentTimeTool()])
 tools = [query_current_year, query_current_month, CurrentTimeTool()]
 
@@ -71,7 +69,7 @@ agent = create_react_agent(llm, tools, prompt)
 agent_executor = AgentExecutor(
     agent=agent, tools=tools, verbose=True, handle_parsing_errors=True
 )
-result = agent_executor.invoke({"input": "现在几月份?"})
+result = agent_executor.invoke({"input": "我的生日是什么时候?"})
 
 print(result)
 
