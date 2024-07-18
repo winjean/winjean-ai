@@ -8,9 +8,15 @@ https://github.com/open-webui/open-webui
 
 
 * LangChain API 参考  
-https://api.python.langchain.com/en/latest/langchain_api_reference.html
-https://python.langchain.com/v0.2/docs/introduction/  
-https://www.langchain.asia/
+  https://api.python.langchain.com/en/latest/langchain_api_reference.html
+  https://python.langchain.com/v0.2/docs/introduction/
+  https://www.langchain.asia/
+  https://langchain.com/
+  https://www.langchain.cn/
+  https://python.langchain.com/en/latest/
+  https://blog.langchain.dev/
+  https://www.langchain.com.cn/
+  https://blog.csdn.net/wenxingchen?type=blog
 
 
 * Milvus  
