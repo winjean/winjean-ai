@@ -5,6 +5,18 @@ import pandas
 # streamlit run streamlit-test.py
 #
 
+streamlit.set_page_config(
+    "Langchain-Chatchat WebUI",
+    # get_img_base64("chatchat_icon_blue_square_v2.png"),
+    initial_sidebar_state="expanded",
+    menu_items={
+        "Get Help": "https://github.com/chatchat-space/Langchain-Chatchat",
+        "Report a bug": "https://github.com/chatchat-space/Langchain-Chatchat/issues",
+        "About": f"""欢迎使用 Langchain-Chatchat WebUI {1}！""",
+    },
+    layout="centered",
+)
+
 # 写入标题
 streamlit.title('My First Streamlit App')
 
@@ -12,6 +24,24 @@ sidebar_selection = streamlit.sidebar.selectbox('Select an option', ['Option 1',
 
 streamlit.radio('Choose a number:', [1, 2, 3, 4, 5])
 streamlit.checkbox('I agree')
+
+
+
+streamlit.markdown(
+    """
+    <style>
+    [data-testid="stSidebarUserContent"] {
+        padding-top: 20px;
+    }
+    .block-container {
+        padding-top: 25px;
+    }
+    [data-testid="stBottomBlockContainer"] {
+        padding-bottom: 20px;
+    }
+    """,
+    unsafe_allow_html=True,
+)
 
 
 # 加载数据
