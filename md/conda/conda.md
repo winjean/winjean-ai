@@ -31,4 +31,4 @@ conda env create -f environment.yml: 使用YAML文件创建一个新环境。
 conda update conda: 更新 Conda 到最新版本。
 conda info: 显示关于 Conda 的信息。
 
-pip install -i https://pypi.tuna.tsinghua.edu.cn/simple [package-name]
+
