@@ -20,6 +20,7 @@ conda deactivate: 退出当前环境。
 conda env list: 列出所有可用的环境。
 conda info --env (同上)
 conda list: 在当前环境中列出所有已安装的包。
+conda list [package-name]: 在当前环境中列出对应已安装的包。
 conda install [package-name]: 安装指定的包。
 conda update [package-name]: 更新指定的包。
 conda remove [package-name]: 移除指定的包。
