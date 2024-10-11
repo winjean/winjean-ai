@@ -1,3 +1,5 @@
+下载地址 https://www.anaconda.com/download/success
+
 conda config --show  查看envs_dirs
 conda config --show channels
 
@@ -31,5 +33,9 @@ conda env export > environment.yml: 导出当前环境的配置到一个YAML文�
 conda env create -f environment.yml: 使用YAML文件创建一个新环境。
 conda update conda: 更新 Conda 到最新版本。
 conda info: 显示关于 Conda 的信息。
+
+conda install conda-forge::python-annoy
+
+conda install --yes --file requirements.txt
 
 

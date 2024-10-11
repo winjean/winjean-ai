@@ -1,0 +1,2 @@
+where conda
+where python
