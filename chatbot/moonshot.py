@@ -26,8 +26,8 @@ def string_length(query: str) -> int:
     return len(query)
 
 class CalculatorInput(BaseModel):
-    a: int = Field(description="输入字符串的长度")
-    b: int = Field(description="输入字符串的长度")
+    a: int = Field(description="输入第一个数字")
+    b: int = Field(description="输入第二个数字")
 
 @tool("Multiply", args_schema=CalculatorInput, return_direct=False)
 def multiply(a: int, b: int) -> int:
@@ -35,11 +35,11 @@ def multiply(a: int, b: int) -> int:
     return a * b
 
 class SortList(BaseModel):
-    num: str = Field(description="待排序列表")
+    num: str = Field(description="待排序序列")
 
 @tool("SortList", args_schema=SortList, return_direct=False)
 def sorter(num):
-    """排序字符串列表中的数字."""
+    """排序字符串中的数字序列."""
     return sorted(eval(num))
 
 tools = [multiply,sorter,string_length]
@@ -95,11 +95,13 @@ agent_executor = AgentExecutor(
     agent=agent, tools=tools, verbose=True, handle_parsing_errors=True
 )
 
-response = agent_executor.invoke({"input": "告诉我`adddd`的字符串长度乘以`sssss`的字符串长度是多少？ 然后对`[10,4,7]`中的数字排序,最后我的名字叫什么？再用中文简单介绍一下南京,",
-                                  "chat_history": [
-                                        HumanMessage(content="hi! my name is bob"),
-                                        AIMessage(content="Hello Bob! How can I assist you today?"),
-                                ]})
+response = agent_executor.invoke({
+    "input": "告诉我`adddd`的字符串长度乘以`sssss`的字符串长度是多少？ 然后对`[10,4,7]`中的数字排序,最后我的名字叫什么？再用中文简单介绍一下南京,",
+    "chat_history": [
+        HumanMessage(content="hi! my name is bob"),
+        AIMessage(content="Hello Bob! How can I assist you today?"),
+    ]
+})
 
 print(response)
 print(response['input'])
