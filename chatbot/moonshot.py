@@ -1,8 +1,21 @@
-from langchain_core.messages import HumanMessage,SystemMessage,AIMessage
+from langchain_core.messages import (
+    HumanMessage,
+    SystemMessage,
+    AIMessage
+)
 from langchain_community.llms.moonshot import Moonshot
-from langchain.tools import StructuredTool, tool
+from langchain.tools import (
+    StructuredTool,
+    tool
+)
 from pydantic import BaseModel, Field
-from langchain.agents import AgentExecutor,create_structured_chat_agent
+from langchain.agents import (
+    AgentExecutor,
+    create_structured_chat_agent,
+    create_react_agent,
+    create_json_agent,
+    create_json_chat_agent
+)
 from langchain import hub
 from langchain.prompts import (
     ChatPromptTemplate,
@@ -89,7 +102,10 @@ prompt = ChatPromptTemplate.from_messages([
     ("human", human),
 ])
 
-agent = create_structured_chat_agent(llm=model, tools=tools, prompt=prompt)
+# create_react_agent
+# create_json_agent
+agent = create_json_chat_agent(llm=model, tools=tools, prompt=prompt)
+# agent = create_structured_chat_agent(llm=model, tools=tools, prompt=prompt)
 
 agent_executor = AgentExecutor(
     agent=agent, tools=tools, verbose=True, handle_parsing_errors=True
