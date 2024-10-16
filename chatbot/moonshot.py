@@ -11,7 +11,7 @@ from langchain.prompts import (
 
 import os
 
-os.environ["moonshot_api_key"]="sk-eJ55Ld7u8mu42HK1gqF6C8VRIknLjIGH4ZWXOLUMG14ip0Yl000"
+os.environ["moonshot_api_key"]="your api key"
 os.environ["model_name"]="moonshot-v1-8k"
 os.environ["api_base_url"]="https://api.moonshot.cn/v1"
 
@@ -89,7 +89,6 @@ prompt = ChatPromptTemplate.from_messages([
     ("human", human),
 ])
 
-# agent = create_structured_chat_agent(llm=model, tools=tools, prompt=prompt)
 agent = create_structured_chat_agent(llm=model, tools=tools, prompt=prompt)
 
 agent_executor = AgentExecutor(
