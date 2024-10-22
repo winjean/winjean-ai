@@ -13,7 +13,6 @@ from langchain.agents import (
     AgentExecutor,
     create_structured_chat_agent,
     create_react_agent,
-    create_json_agent,
     create_json_chat_agent
 )
 from langchain import hub
@@ -24,7 +23,7 @@ from langchain.prompts import (
 
 import os
 
-os.environ["moonshot_api_key"]="your api key"
+os.environ["moonshot_api_key"]="sk-"
 os.environ["model_name"]="moonshot-v1-8k"
 os.environ["api_base_url"]="https://api.moonshot.cn/v1"
 
@@ -102,17 +101,22 @@ prompt = ChatPromptTemplate.from_messages([
     ("human", human),
 ])
 
-# create_react_agent
-# create_json_agent
-agent = create_json_chat_agent(llm=model, tools=tools, prompt=prompt)
-# agent = create_structured_chat_agent(llm=model, tools=tools, prompt=prompt)
+# agent = create_react_agent(llm=model, tools=tools, prompt=prompt)
+# agent = create_json_chat_agent(llm=model, tools=tools, prompt=prompt)
+agent = create_structured_chat_agent(llm=model, tools=tools, prompt=prompt)
+
+agent_callbacks = None
 
 agent_executor = AgentExecutor(
-    agent=agent, tools=tools, verbose=True, handle_parsing_errors=True
+    agent=agent,
+    tools=tools,
+    verbose=True,
+    handle_parsing_errors=True,
+    callbacks=agent_callbacks
 )
 
 response = agent_executor.invoke({
-    "input": "告诉我`adddd`的字符串长度乘以`sssss`的字符串长度是多少？ 然后对`[10,4,7]`中的数字排序,最后我的名字叫什么？再用中文简单介绍一下南京,",
+    "input": "用中文简单介绍一下南京, 告诉我`adddd`的字符串长度乘以`sssss`的字符串长度是多少？ 然后对`[10,4,7]`中的数字排序,最后我的名字叫什么？",
     "chat_history": [
         HumanMessage(content="hi! my name is bob"),
         AIMessage(content="Hello Bob! How can I assist you today?"),
