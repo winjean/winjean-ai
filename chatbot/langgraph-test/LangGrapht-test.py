@@ -3,38 +3,59 @@ from langgraph.graph import StateGraph
 from typing import TypedDict, List, Annotated, Union
 import operator
 from langchain_core.agents import AgentAction, AgentFinish
-from langchain_core.messages import BaseMessage
-from langchain_core.agents import AgentFinish
 from langgraph.prebuilt import ToolNode
 from langchain.tools.render import format_tool_to_openai_function
 from langchain.tools import BaseTool, StructuredTool, Tool, tool
-from langchain_core.messages import HumanMessage
 import random
+from langchain.prompts import (
+    ChatPromptTemplate,
+    MessagesPlaceholder,
+)
+from langchain_core.messages import (
+    HumanMessage,
+    BaseMessage,
+    SystemMessage,
+    AIMessage
+)
+from langgraph.prebuilt import ToolInvocation
+from typing import TypedDict, Annotated, Sequence
+import operator
+import os
+from langchain_community.llms.moonshot import Moonshot
 
-
-
+from pydantic import BaseModel, Field
+from langchain.agents import (
+    AgentExecutor,
+    create_structured_chat_agent,
+    create_react_agent,
+    create_json_chat_agent,
+    create_self_ask_with_search_agent,
+    create_tool_calling_agent,
+    create_openai_tools_agent,
+    create_xml_agent
+)
 
 #############定义一些自定义的tool##############################
 @tool("lower_case", return_direct=True)
 def to_lower_case(input: str) -> str:
     """返回全部小写的输入"""
+    print(input)
     return input.lower()
 
 
 @tool("random_number", return_direct=True)
 def random_number_maker(input: str) -> str:
     """返回0-100之间的随机数"""
+    print(input)
     return random.randint(0, 100)
 
 
-tools = [to_lower_case, random_number_maker]
+# tools = [to_lower_case, random_number_maker]
 
-tool_executor = ToolNode(tools)
+# tool_executor = ToolNode(tools)
 
 ####################################定义另一个stategraph################################
-from typing import TypedDict, Annotated, Sequence
-import operator
-from langchain_core.messages import BaseMessage
+
 
 
 # 不需要中间步骤，全部都在message里面
@@ -44,8 +65,7 @@ class AgentState_chatmodel(TypedDict):
 
 ###################################初始化节点############################################
 
-import os
-from langchain_community.llms.moonshot import Moonshot
+
 
 os.environ["moonshot_api_key"]="sk-"
 os.environ["model_name"]="moonshot-v1-8k"
@@ -53,27 +73,111 @@ os.environ["api_base_url"]="https://api.moonshot.cn/v1"
 
 model=Moonshot()
 
+
+
+class SearchInput(BaseModel):
+    query: str = Field(description="计算字符串长度")
+
+@tool("StringLength", args_schema=SearchInput, return_direct=False)
+def string_length(query: str) -> int:
+    """计算字符串长度."""
+    return len(query)
+
+class CalculatorInput(BaseModel):
+    a: int = Field(description="输入第一个数字")
+    b: int = Field(description="输入第二个数字")
+
+@tool("Multiply", args_schema=CalculatorInput, return_direct=False)
+def multiply(a: int, b: int) -> int:
+    """计算两个数字的乘积."""
+    return a * b
+
+class SortList(BaseModel):
+    num: str = Field(description="待排序序列")
+
+@tool("SortList", args_schema=SortList, return_direct=False)
+def sorter(num):
+    """排序字符串中的数字序列."""
+    return sorted(eval(num))
+
+@tool("Intermediate Answer", args_schema=SortList, return_direct=False)
+def intermediate_Answer(num):
+    """排序字符串中的数字序列."""
+    return sorted(eval(num))
+
+tools = [multiply,sorter,string_length]
+tool_executor = ToolNode(tools)
+# prompt = hub.pull("hwchase17/structured-chat-agent")
+
+system = '''
+    Respond to the human as helpfully and accurately as possible. You have access to the following tools:
+    {tools}
+    Use a json blob to specify a tool by providing an action key (tool name) and an action_input key (tool input).
+    Valid "action" values: "Final Answer" or {tool_names}
+    Provide only ONE action per $JSON_BLOB, as shown:
+    ```
+    {{
+      "action": $TOOL_NAME,
+      "action_input": $INPUT
+    }}
+    ```
+
+    Follow this format:
+    Question: input question to answer
+    Thought: consider previous and subsequent steps
+    Action:
+    ```
+    $JSON_BLOB
+    ```
+    Observation: action result
+    ... (repeat Thought/Action/Observation N times)
+    Thought: I know what to respond
+    Action:
+    ```
+    {{
+      "action": "Final Answer",
+      "action_input": "Final response to human"
+    }}
+    Begin! Reminder to ALWAYS respond with a valid json blob of a single action. Use tools if necessary. Respond directly if appropriate. Format is Action:```$JSON_BLOB```then Observation
+'''
+
+human = '''
+    {input}
+    {agent_scratchpad}
+    (reminder to respond in a JSON blob no matter what)
+'''
+prompt = ChatPromptTemplate.from_messages([
+    ("system", system),
+    MessagesPlaceholder("chat_history", optional=True),
+    ("human", human),
+])
+
+
+# agent = create_react_agent(llm=model, tools=tools, prompt=prompt)
+# agent = create_json_chat_agent(llm=model, tools=tools, prompt=prompt)
+agent_runnable = create_structured_chat_agent(llm=model, tools=tools, prompt=prompt)
+
 # print(model.invoke("1+1等于"))
 
 # 定义agent
 def run_agent(data):
     # 调用agent可执行对象，并传入数据
-    agent_outcome = model.invoke(data["input"])
+    agent_outcome = agent_runnable.invoke(data)
     # agent_outcome = {"tool":"返回0-100之间的随机数"}
     # 返回代理的结果
-    return {"agent_outcome": AgentFinish({"结果":agent_outcome},agent_outcome)}
+    return {"agent_outcome": agent_outcome}
 
 
-from langgraph.prebuilt import ToolInvocation
+
 # 定义执行工具的函数
 def execute_tools(data):
-    action = ToolInvocation(
-        tool="random_number",
-        tool_input="",
-    )
+    # action = ToolInvocation(
+    #     tool="random_number",
+    #     tool_input="",
+    # )
     # 获取最近的代理结果 - 这是在上面的agent中添加的关键字
-    # agent_action = data['agent_outcome']
-    agent_action = action
+    agent_action = data['agent_outcome']
+    # agent_action = action
     # 执行工具
     output = tool_executor.invoke(agent_action)
     # 打印代理操作
@@ -139,7 +243,19 @@ workflow.add_edge('action', 'agent')
 
 # 最后进行编译compile，将其编译成一个LangChain可运行对象
 app = workflow.compile()
-inputs = {"input":"3乘以5等于多少,输出最终的结果"}
+# inputs = {"input":"3乘以5等于多少,输出最终的结果"}
+inputs = {
+    "input":"用中文简单介绍一下南京, 告诉我`adddd`的字符串长度乘以`sssss`的字符串长度是多少？ 然后对`[10,4,7]`中的数字排序,最后我的名字叫什么？",
+    "chat_history": [
+            HumanMessage(content="hi! my name is bob"),
+            AIMessage(content="Hello Bob! How can I assist you today?"),
+        ]
+}
 response=app.invoke(inputs)
 
-print(response)
+# print(response["input"])
+# print(response["chat_history"])
+# print(response["agent_outcome"])
+# print(response["intermediate_steps"])
+
+print(response["agent_outcome"].return_values["output"])
