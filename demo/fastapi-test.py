@@ -1,10 +1,18 @@
 import time
 import functools
-
-from fastapi import FastAPI, Request, Depends
+from fastapi import FastAPI
+from fastapi.requests import Request
 from fastapi.responses import JSONResponse
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+
 
 app = FastAPI()
+limiter = Limiter(key_func=get_remote_address)
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 def measure_time_test(func):
@@ -32,7 +40,6 @@ async def read_root():
 
 @app.get("/items/{item_id}")
 @app.get("/items/{item_id}/{q}")
-@app.get("/aaaa")
 async def read_item(item_id: int = 1, q: str = None):
     return {"item_id": item_id, "q": q}
 
@@ -53,6 +60,7 @@ async def async_function2():
 
 @app.post("/items/")
 @measure_time_test
+@limiter.limit("2/minute")
 async def post_item(request: Request):
     item = await request.json()
 
@@ -68,7 +76,7 @@ async def post_item(request: Request):
 
     item["test"] = "test"
     return JSONResponse(
-        status_code=500,
+        status_code=200,
         headers={"X-Foo": "bar"},
         content=item
     )
