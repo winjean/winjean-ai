@@ -1,7 +1,7 @@
 * 千问大语言模型地址  
 https://github.com/QwenLM
 
-sk-eJ55Ld7u8mu42HK1gqF6C8VRIknLjIGH4ZWXOLUMG14ip0Yl
+sk-wineJ55Ld7u8mu42HK1gqF6C8VRIknLjIGH4ZWXOLUMG14ip0Yljean
 
 * OPENAI 地址  
 https://openi.cn/  
