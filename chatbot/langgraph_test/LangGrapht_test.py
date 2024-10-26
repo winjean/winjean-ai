@@ -1,10 +1,6 @@
 from langgraph.graph import END, StateGraph
-from langgraph.graph import StateGraph
-from typing import TypedDict, List, Annotated, Union
-import operator
 from langchain_core.agents import AgentAction, AgentFinish
 from langgraph.prebuilt import ToolNode
-from langchain.tools.render import format_tool_to_openai_function
 from langchain.tools import BaseTool, StructuredTool, Tool, tool
 import random
 from langchain.prompts import (
@@ -18,7 +14,7 @@ from langchain_core.messages import (
     AIMessage
 )
 from langgraph.prebuilt import ToolInvocation
-from typing import TypedDict, Annotated, Sequence
+from typing import TypedDict, Annotated, Sequence, Union
 import operator
 import os
 from langchain_community.llms.moonshot import Moonshot

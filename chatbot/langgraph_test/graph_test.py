@@ -44,9 +44,10 @@ def lsmsp_tools_condition(
       ai_message = messages[-1]
    else:
       raise ValueError(f"No messages found in input state to tool_edge: {state}")
+
    if hasattr(ai_message, "tool_calls") and len(ai_message.tool_calls) > 0:
       return "model2"
-   elif hasattr(ai_message, "content") and ai_message.content.find('Final Answer:') > 0:
+   elif hasattr(ai_message, "content") :
       return "end"
    else:
       return "model3"
@@ -73,5 +74,6 @@ graph.set_finish_point("model3")
 
 runnable = graph.compile()
 
-show_img(BytesIO(runnable.get_graph(xray=True).draw_mermaid_png()))
-
+# show_img(BytesIO(runnable.get_graph(xray=True).draw_mermaid_png()))
+response=runnable.invoke("简单介绍一下南京")
+print(response[-1].content)
