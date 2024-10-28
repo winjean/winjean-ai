@@ -2,10 +2,10 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-x = torch.tensor([1.0, 2.0])
-y = torch.tensor([3.0, 4.0])
-z = x + y
-print(z)
+# x = torch.tensor([1.0, 2.0])
+# y = torch.tensor([3.0, 4.0])
+# z = x + y
+# print(z)
 
 
 class SimpleNet(nn.Module):

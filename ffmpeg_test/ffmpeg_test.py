@@ -104,10 +104,12 @@ output_file = os.path.join(output_video, "output_merge.mp4")
 ffmpeg_command = [
     'ffmpeg',
     '-y',
+    '-ss', '00:00:20',  # 开始时间
+    '-t', '00:00:20',   # 持续时间
     '-i', video_input,  # 输入视频文件
+    '-ss', '00:00:20',  # 开始时间
+    '-t', '00:00:20',   # 持续时间
     '-i', audio_input,  # 输入音频文件
-    # '-ss', '00:00:05',  # 开始时间
-    # '-t', '00:00:10',   # 持续时间
     '-c:v', 'copy',     # 复制视频流，不重新编码
     '-c:a', 'aac',      # 使用 AAC 编码音频
     '-strict', 'experimental',  # 允许实验性的编码器选项
