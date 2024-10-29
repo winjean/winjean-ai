@@ -1,11 +1,21 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import tensorflow as tf
+# from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Flatten
+# from tensorflow.keras.datasets import mnist
+import numpy as np
+import matplotlib.pyplot as plt
 
-# x = torch.tensor([1.0, 2.0])
-# y = torch.tensor([3.0, 4.0])
-# z = x + y
-# print(z)
+
+# 线性层：nn.Linear(in_features, out_features)
+# 卷积层：nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0)
+# 池化层：nn.MaxPool2d(kernel_size, stride=None, padding=0)
+# 批量归一化层：nn.BatchNorm2d(num_features)
+# 激活函数：nn.ReLU(), nn.Sigmoid(), nn.Tanh()
+# 损失函数：nn.MSELoss(), nn.CrossEntropyLoss(), nn.BCELoss()
+# 优化器：optim.SGD(), optim.Adam(), optim.RMSprop()
 
 
 class SimpleNet(nn.Module):
@@ -54,6 +64,12 @@ for epoch in range(10):  # 迭代次数
     optimizer.step()  # 更新参数
 
     print(f'Epoch [{epoch+1}/10], Loss: {loss.item():.4f}')
+
+
+# 模型评估
+# model.eval()
+
+# 使用模型进行预测
 
 
 # 保存模型
