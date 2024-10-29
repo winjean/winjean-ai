@@ -1,13 +1,9 @@
 from edge_tts import Communicate
 import asyncio
 
-""" 
-text: 要合成的文本
-voice: 语音种类，可以是英文或中文，例如：
-en-US-JennyNeural
-zh-CN-YunxiaNeural
-zh-CN-XiaoxiaoNeural
-"""
+# text: 要合成的文本
+# voice: 语音种类，可以是英文或中文，例如：
+# en-US-JennyNeural zh-CN-YunxiaNeural zh-CN-XiaoxiaoNeural
 
 
 async def edge_tts_test(text, voice="zh-CN-YunxiaNeural"):
