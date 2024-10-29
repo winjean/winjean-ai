@@ -4,6 +4,7 @@ import os
 # -i input: 指定输入文件。
 # -f format: 强制使用某种输出格式。
 # -an：不提取音频
+# -vn：不包含视频流
 # -y: 覆盖输出文件而不询问。
 # -c[:stream_specifier] codec: 选择编解码器。例如，-c:v libx264 表示使用 H.264 视频编解码器，-c:a aac 表示使用 AAC 音频编解码器。
 # -c:v copy: 复制视频流，不进行重新编码。
@@ -18,9 +19,10 @@ import os
 # -to position: 结束时间偏移，例如 -to 00:01:00.00 表示处理到第 1 分钟结束。
 # -vf filter_graph: 应用视频滤镜，例如 -vf "scale=1280:720" 表示将视频缩放至 1280x720。
 # -vf crop=<width>:<height>:<x>:<y>: 裁剪视频
+# -ab 128k：设置音频比特率为 128 kbps
+# -ac <channels>: 设置音频通道数。  例如 -ac 2
 # -af filter_graph: 应用音频滤镜，例如 -af "volume=0.5" 表示将音量降低至原音量的一半。
 # -ar <sample_rate>: 设置音频采样率  例如 -ar 44100
-# -ac <channels>: 设置音频通道数。  例如 -ac 2
 # -loglevel <level>: 设置日志级别，例如 debug, info, warning, error。
 # -preset <preset>: 设置编码速度与压缩比的预设，例如 ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow。
 
@@ -82,8 +84,8 @@ video_watermark_file = os.path.join(os.getcwd(), "video", "output_watermark.mp4"
 # ffmpeg -i input.mp4 -vf fps=1 output_%03d.jpg
 # ffmpeg -i input.mp4 -ss 00:00:10 -t 00:00:30 -vf fps=1 output_%03d.jpg
 output_jpg = os.path.join(os.getcwd(), "images", "jpg", "output_%03d.jpg")
-# ffmpeg_command = [r'D:\ffmpeg\ffmpeg-master-latest-win64-gpl\bin\ffmpeg', '-i', demo_video_file,
-#                   '-ss', '00:00:02', '-t', '00:00:30', '-vf', 'fps=1', output_jpg]
+ffmpeg_command = [r'D:\ffmpeg\ffmpeg-master-latest-win64-gpl\bin\ffmpeg', '-i', demo_video_file,
+                  '-ss', '00:00:02', '-t', '00:00:30', '-vf', 'fps=1', output_jpg]
 
 # 图片生成视频
 # ffmpeg -i image_%03d.jpg output.mp4
@@ -101,20 +103,20 @@ video_input = output_video_only_file
 audio_input = output_audio_only_file
 output_file = os.path.join(output_video, "output_merge.mp4")
 # 构建 ffmpeg 命令
-ffmpeg_command = [
-    'ffmpeg',
-    '-y',
-    '-ss', '00:00:20',  # 开始时间
-    '-t', '00:00:20',   # 持续时间
-    '-i', video_input,  # 输入视频文件
-    '-ss', '00:00:20',  # 开始时间
-    '-t', '00:00:20',   # 持续时间
-    '-i', audio_input,  # 输入音频文件
-    '-c:v', 'copy',     # 复制视频流，不重新编码
-    '-c:a', 'aac',      # 使用 AAC 编码音频
-    '-strict', 'experimental',  # 允许实验性的编码器选项
-    output_file         # 输出文件
-]
+# ffmpeg_command = [
+#     'ffmpeg',
+#     '-y',
+#     '-ss', '00:00:20',  # 开始时间
+#     '-t', '00:00:20',   # 持续时间
+#     '-i', video_input,  # 输入视频文件
+#     '-ss', '00:00:20',  # 开始时间
+#     '-t', '00:00:20',   # 持续时间
+#     '-i', audio_input,  # 输入音频文件
+#     '-c:v', 'copy',     # 复制视频流，不重新编码
+#     '-c:a', 'aac',      # 使用 AAC 编码音频
+#     '-strict', 'experimental',  # 允许实验性的编码器选项
+#     output_file         # 输出文件
+# ]
 
 
 # 调用 ffmpeg 命令
