@@ -6,6 +6,7 @@ pip install --upgrade setuptools
 pip cache purge
 
 pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
+pip config list
 
 pip install -i https://pypi.tuna.tsinghua.edu.cn/simple [package-name]
 
