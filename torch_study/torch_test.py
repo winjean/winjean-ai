@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
-import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -24,13 +23,14 @@ def download_data():
     ])
 
     # 下载并加载训练数据
-    trainset = torchvision.datasets.MNIST(root='./data', train=True, download=True, transform=transform)
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=64, shuffle=True, num_workers=0, pin_memory=False)
+    train_set = torchvision.datasets.MNIST(root='./data', train=True, download=True, transform=transform)
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=64, shuffle=True, num_workers=0, pin_memory=False)
 
     # 下载并加载测试数据
-    testset = torchvision.datasets.MNIST(root='./data', train=False, download=True, transform=transform)
-    testloader = torch.utils.data.DataLoader(testset, batch_size=64, shuffle=False, num_workers=0, pin_memory=False)
-    return trainloader, testloader
+    test_set = torchvision.datasets.MNIST(root='./data', train=False, download=True, transform=transform)
+    test_loader = torch.utils.data.DataLoader(test_set, batch_size=64, shuffle=False, num_workers=0, pin_memory=False)
+    return train_loader, test_loader
+
 
 class MLP(nn.Module):
     def __init__(self):
@@ -48,30 +48,12 @@ class MLP(nn.Module):
         return x
 
 
-# 创建模型实例
-# model = MLP()
-# model = MLP().cuda()   # 将模型移动到 GPU 上
-
-# 打印模型结构
-# print(model)
-
-
-# 定义损失函数和优化器
-# criterion = nn.MSELoss()
-# criterion = nn.CrossEntropyLoss()
-
-# optimizer = optim.SGD(model.parameters(), lr=0.01)
-# optimizer = optim.Adam(model.parameters(), lr=0.001)
-
-# print("start train ......")
-
-
 # 模型评估
-def evaluate(model, testLoader):
+def evaluate(model, test_loader):
     correct = 0
     total = 0
     with torch.no_grad():
-        for data in testLoader:
+        for data in test_loader:
             images, labels = data
             outputs = model(images)
             _, predicted = torch.max(outputs.data, 1)
@@ -79,15 +61,12 @@ def evaluate(model, testLoader):
             correct += (predicted == labels).sum().item()
     print(f'Accuracy of the network on the 10000 test images: {100 * correct / total:.2f}%')
 
-# 绘制训练过程中的损失曲线
-# 记录训练过程中的损失
-# losses = []
 
 # 训练模型并记录损失
-def train(model, criterion, optimizer, trainloader, losses, num_epochs=10):
+def train(model, criterion, optimizer, train_loader, losses, num_epochs=10):
     for epoch in range(num_epochs):
         running_loss = 0.0
-        for i, data in enumerate(trainloader, 0):
+        for i, data in enumerate(train_loader, 0):
             inputs, labels = data
             optimizer.zero_grad()   # 清零梯度
             outputs = model(inputs)     # 前向传播
@@ -95,10 +74,11 @@ def train(model, criterion, optimizer, trainloader, losses, num_epochs=10):
             loss.backward()     # 反向传播和优化
             optimizer.step()    # 更新参数
             running_loss += loss.item()
-        losses.append(running_loss / len(trainloader))
-        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {running_loss / len(trainloader):.4f}')
+        losses.append(running_loss / len(train_loader))
+        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {running_loss / len(train_loader):.4f}')
     print('Finished Training')
     return losses
+
 
 # 绘制损失曲线
 # 创建线图
@@ -109,10 +89,11 @@ def plot_losses(losses):
     plt.title('Training Loss over Epochs')
     plt.show()
 
+
 # 使用模型进行预测
 # 选择一些测试样本进行预测
-def predict(model, testloader):
-    dataiter = iter(testloader)
+def predict(model, test_loader):
+    dataiter = iter(test_loader)
     images, labels = next(dataiter)
 
     # 前向传播
@@ -129,27 +110,31 @@ def predict(model, testloader):
     plt.show()
 
 
-# 保存模型
-# torch.save(model.state_dict(), 'mnist_model.pth')
-
-# 加载模型
-# model = MLP()
-# model.load_state_dict(torch.load('mnist_model.pth'))
-
-# 使用加载的模型进行预测
-
 if __name__ == '__main__':
     import multiprocessing
     multiprocessing.set_start_method('spawn')
 
-    trainloader, testloader = download_data()
+    train_loader, test_loader = download_data()
+
+    # 创建模型实例
     model = MLP()
+    # model = MLP().cuda()   # 将模型移动到 GPU 上
+    # print(model)
+
+    # 定义损失函数和优化器
+    # criterion = nn.MSELoss()
     criterion = nn.CrossEntropyLoss()
+    # optimizer = optim.SGD(model.parameters(), lr=0.001)
     optimizer = optim.Adam(model.parameters(), lr=0.001)
-    # train(model, criterion, optimizer, trainloader, losses)
-    # evaluate(model, testloader)
+
+    # train(model, criterion, optimizer, train_loader, losses)
+    # evaluate(model, test_loader)
+
+    # 绘制训练过程中的损失曲线
+    # 记录训练过程中的损失
     losses = []
-    # train(model, criterion, optimizer, trainloader, losses)
+
+    # train(model, criterion, optimizer, train_loader, losses)
     # # 保存模型
     # torch.save(model.state_dict(), 'mnist_model.pth')
     # print("save model finish")
@@ -158,7 +143,7 @@ if __name__ == '__main__':
     model.load_state_dict(torch.load('mnist_model.pth', weights_only=True))
     print("load model finish")
 
-    train(model, criterion, optimizer, trainloader, losses)
+    train(model, criterion, optimizer, train_loader, losses)
     print("train finish")
     plot_losses(losses)
-    predict(model, testloader)
+    predict(model, test_loader)
