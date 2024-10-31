@@ -10,8 +10,10 @@ import matplotlib.pyplot as plt
 # 卷积层：nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0)
 # 池化层：nn.MaxPool2d(kernel_size, stride=None, padding=0)
 # 批量归一化层：nn.BatchNorm2d(num_features)
+
 # 激活函数：nn.ReLU(), nn.Sigmoid(), nn.Tanh()
 # 损失函数：nn.MSELoss(), nn.CrossEntropyLoss(), nn.BCELoss()
+
 # 优化器：optim.SGD(), optim.Adam(), optim.RMSprop()
 
 
@@ -24,21 +26,21 @@ def download_data():
 
     # 下载并加载训练数据
     train_set = torchvision.datasets.MNIST(root='./data', train=True, download=True, transform=transform)
-    train_loader = torch.utils.data.DataLoader(train_set, batch_size=64, shuffle=True, num_workers=0, pin_memory=False)
+    _train_loader = torch.utils.data.DataLoader(train_set, batch_size=64, shuffle=True, num_workers=0, pin_memory=False)
 
     # 下载并加载测试数据
     test_set = torchvision.datasets.MNIST(root='./data', train=False, download=True, transform=transform)
-    test_loader = torch.utils.data.DataLoader(test_set, batch_size=64, shuffle=False, num_workers=0, pin_memory=False)
-    return train_loader, test_loader
+    _test_loader = torch.utils.data.DataLoader(test_set, batch_size=64, shuffle=False, num_workers=0, pin_memory=False)
+    return _train_loader, _test_loader
 
 
 class MLP(nn.Module):
     def __init__(self):
         super(MLP, self).__init__()
         self.flatten = nn.Flatten()
-        self.fc1 = nn.Linear(28 * 28, 128)  # 输入层到隐藏层
-        self.fc2 = nn.Linear(128, 64)       # 隐藏层到隐藏层
-        self.fc3 = nn.Linear(64, 10)        # 隐藏层到输出层
+        self.fc1 = nn.Linear(28 * 28, 128)          # 输入层到隐藏层
+        self.fc2 = nn.Linear(128, 64)     # 隐藏层到隐藏层
+        self.fc3 = nn.Linear(64, 10)      # 隐藏层到输出层
 
     def forward(self, x):
         x = self.flatten(x)
@@ -49,13 +51,13 @@ class MLP(nn.Module):
 
 
 # 模型评估
-def evaluate(model, test_loader):
+def evaluate(_model, _test_loader):
     correct = 0
     total = 0
     with torch.no_grad():
-        for data in test_loader:
+        for data in _test_loader:
             images, labels = data
-            outputs = model(images)
+            outputs = _model(images)
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
@@ -63,27 +65,27 @@ def evaluate(model, test_loader):
 
 
 # 训练模型并记录损失
-def train(model, criterion, optimizer, train_loader, losses, num_epochs=10):
+def train(_model, _criterion, _optimizer, _train_loader, _losses, num_epochs=10):
     for epoch in range(num_epochs):
         running_loss = 0.0
-        for i, data in enumerate(train_loader, 0):
+        for i, data in enumerate(_train_loader, 0):
             inputs, labels = data
-            optimizer.zero_grad()   # 清零梯度
-            outputs = model(inputs)     # 前向传播
-            loss = criterion(outputs, labels)
+            _optimizer.zero_grad()   # 清零梯度
+            outputs = _model(inputs)     # 前向传播
+            loss = _criterion(outputs, labels)
             loss.backward()     # 反向传播和优化
-            optimizer.step()    # 更新参数
+            _optimizer.step()    # 更新参数
             running_loss += loss.item()
-        losses.append(running_loss / len(train_loader))
-        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {running_loss / len(train_loader):.4f}')
+        _losses.append(running_loss / len(_train_loader))
+        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {running_loss / len(_train_loader):.4f}')
     print('Finished Training')
-    return losses
+    return _losses
 
 
 # 绘制损失曲线
 # 创建线图
-def plot_losses(losses):
-    plt.plot(losses)
+def plot_losses(_losses):
+    plt.plot(_losses)
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
     plt.title('Training Loss over Epochs')
@@ -92,12 +94,12 @@ def plot_losses(losses):
 
 # 使用模型进行预测
 # 选择一些测试样本进行预测
-def predict(model, test_loader):
-    dataiter = iter(test_loader)
+def predict(_model, _test_loader):
+    dataiter = iter(_test_loader)
     images, labels = next(dataiter)
 
     # 前向传播
-    outputs = model(images)
+    outputs = _model(images)
     _, predicted = torch.max(outputs, 1)
 
     # 显示预测结果
