@@ -6,17 +6,6 @@ import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 
 
-# 线性层：nn.Linear(in_features, out_features)
-# 卷积层：nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0)
-# 池化层：nn.MaxPool2d(kernel_size, stride=None, padding=0)
-# 批量归一化层：nn.BatchNorm2d(num_features)
-
-# 激活函数：nn.ReLU(), nn.Sigmoid(), nn.Tanh()
-# 损失函数：nn.MSELoss(), nn.CrossEntropyLoss(), nn.BCELoss()
-
-# 优化器：optim.SGD(), optim.Adam(), optim.RMSprop()
-
-
 def download_data():
     # 定义数据变换
     transform = transforms.Compose([

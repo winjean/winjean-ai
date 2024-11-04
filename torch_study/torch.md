@@ -46,7 +46,7 @@
 * 常用模块：torch.nn.CrossEntropyLoss、torch.nn.MSELoss、torch.nn.BCELoss
 * 应用场景：分类任务、回归任务等。
  
-## 常见的激活函数
+### 常见的激活函数
 * ReLU (Rectified Linear Unit)：
   * 公式：( f(x) = \max(0, x) )
   * 特点：简单高效，计算速度快；能够有效缓解梯度消失问题；但可能会导致“死区”问题（即某些神经元的输出始终为零）。
