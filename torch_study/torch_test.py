@@ -65,6 +65,13 @@ def train(_model, _criterion, _optimizer, _train_loader, _losses, num_epochs=10)
             loss.backward()     # 反向传播和优化
             _optimizer.step()    # 更新参数
             running_loss += loss.item()
+
+        # for name, param in model.named_parameters():
+        #     if param.requires_grad:
+        #         print(f"参数名称: {name}")
+        #         print(f"梯度: {param.grad}")
+        #         print(f"梯度的范数: {param.grad.norm()}")
+
         _losses.append(running_loss / len(_train_loader))
         print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {running_loss / len(_train_loader):.4f}')
     print('Finished Training')
@@ -136,5 +143,5 @@ if __name__ == '__main__':
 
     train(model, criterion, optimizer, train_loader, losses)
     print("train finish")
-    plot_losses(losses)
-    predict(model, test_loader)
+    # plot_losses(losses)
+    # predict(model, test_loader)
