@@ -31,6 +31,7 @@ class MLP(nn.Module):
         self.fc2 = nn.Linear(128, 64)     # 隐藏层到隐藏层
         self.fc3 = nn.Linear(64, 10)      # 隐藏层到输出层
 
+    # 前向传播
     def forward(self, x):
         x = self.flatten(x)
         x = torch.relu(self.fc1(x))
@@ -63,7 +64,7 @@ def train(_model, _criterion, _optimizer, _train_loader, _losses, num_epochs=10)
             outputs = _model(inputs)     # 前向传播
             loss = _criterion(outputs, labels)
             loss.backward()     # 反向传播和优化
-            _optimizer.step()    # 更新参数
+            _optimizer.step()    # 更新模型参数
             running_loss += loss.item()
 
         # for name, param in model.named_parameters():
