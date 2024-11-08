@@ -1,10 +1,32 @@
 import numpy as np
 
-# 向量加减乘除时，两个向量的维度必须相同
 
+# print(np.random.rand(10))
+# print(np.random.randint(0, 10, 5))
+# print(np.random.randn(10))
+# print(np.arange(10))
+# print(np.linspace(1, 10, 4))
+# print(np.zeros(4))
+# print(np.ones(4))
+# print(np.full(4, 5))
+# print(np.eye(5))
+
+print(np.stack((np.zeros(4), np.ones(4), np.full(4,8))))
+# print(np.hstack((np.zeros(4), np.ones(3), np.full(4,8))))
+# print(np.dstack((np.zeros(4), np.ones(4), np.full(4,8))))
+print(np.vstack((np.zeros(4), np.ones(4), np.full(4,8))))
+# arr = np.arange(24).reshape(2, 3, 4)
+# print(arr)
+# print(np.unstack(arr, axis=1))
+
+
+"""
+# 向量加减乘除时，两个向量的维度必须相同
 # 创建两个向量
 a = np.array([1, 2, 3])
 b = np.array([4, 5, 6])
+print(a)
+print(b)
 
 # 向量相加
 print(a + b)
@@ -33,3 +55,4 @@ print(np.cross(a, b))
 # 计算模长  模长是指矢量的长度，通常用 L2 范数表示
 print(np.linalg.norm(a))
 # 输出: 3.7416573867739413
+"""
