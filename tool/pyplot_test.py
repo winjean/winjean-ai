@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot(x, y):
-    plt.plot(x, y)
+def plot(a, b):
+    plt.plot(a, b)
     plt.xlabel('x')
     plt.ylabel('y')
     plt.title('value')
