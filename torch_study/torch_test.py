@@ -63,9 +63,12 @@ def train(_model, _criterion, _optimizer, _train_loader, _losses, num_epochs=10)
             _optimizer.zero_grad()   # 清零梯度
             outputs = _model(inputs)     # 前向传播
             loss = _criterion(outputs, labels)
+            _model.fc1.named_parameters()
             loss.backward()     # 反向传播和优化
             _optimizer.step()    # 更新模型参数
             running_loss += loss.item()
+            _model.fc1.named_parameters()
+
 
         # for name, param in model.named_parameters():
         #     if param.requires_grad:

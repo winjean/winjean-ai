@@ -11,13 +11,15 @@ import numpy as np
 # print(np.full(4, 5))
 # print(np.eye(5))
 
-print(np.stack((np.zeros(4), np.ones(4), np.full(4,8))))
+# print(np.stack((np.zeros(4), np.ones(4), np.full(4,8))))
 # print(np.hstack((np.zeros(4), np.ones(3), np.full(4,8))))
 # print(np.dstack((np.zeros(4), np.ones(4), np.full(4,8))))
-print(np.vstack((np.zeros(4), np.ones(4), np.full(4,8))))
+# print(np.vstack((np.zeros(4), np.ones(4), np.full(4,8))))
 # arr = np.arange(24).reshape(2, 3, 4)
 # print(arr)
 # print(np.unstack(arr, axis=1))
+
+
 
 
 """
@@ -31,6 +33,11 @@ print(b)
 # 向量相加
 print(a + b)
 # 输出: [5 7 9]
+
+a = np.array([1, 2, 3])
+print(a)
+print(a + 3)
+# 输出: [4 5 6]
 
 # 向量相减
 print(a - b)
