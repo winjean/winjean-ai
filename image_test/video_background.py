@@ -1,7 +1,9 @@
 import glob
+import os
 import cv2
 import numpy as np
 import subprocess
+import multiprocessing
 from modelscope.pipelines import pipeline
 from modelscope.utils.constant import Tasks
 from modelscope.outputs import OutputKeys
@@ -27,8 +29,8 @@ def get_frame(video_file: str) -> (float, int):
 
 
 def matting_image(input_file: str, output_file: str):
-    input_file_list = load_images(input_file)
     portrait_matting = pipeline(Tasks.portrait_matting, model='damo/cv_unet_image-matting')
+    input_file_list = load_images(input_file)
     for i, input_file in enumerate(input_file_list):
         result = portrait_matting(input_file)
         cv2.imwrite(output_file.format(id=str(i + 1).zfill(4)), result[OutputKeys.OUTPUT_IMG])
@@ -42,8 +44,8 @@ def load_images(input_file: str):
 def merge_images(matting_file: str, output_file: str):
     input_file_list = load_images(matting_file)
 
-    matting_file = r"data\person\matting\image_{id}.png"
-    background_file = r"data\person\background\image_{id}.jpg"
+    matting_file = directory + r"\matting\image_{id}.png"
+    background_file = directory + r"\background\image_{id}.jpg"
 
     for i, input_file in enumerate(input_file_list):
         # 读取带有Alpha通道的前景图像
@@ -81,37 +83,72 @@ def merge_video(input_images: str, output_video: str):
     subprocess.call(ffmpeg_command)
 
 
-def main():
-    person_video_file = r"data\person.mp4"
-    background_video_file = r"data\background.mp4"
+def delete_files_in_directory(directory: str):
+    files = glob.glob(os.path.join(directory, '*'))
 
-    person_fps, person_frame_count = get_frame(person_video_file)
+    for file in files:
+        os.remove(file)
+
+
+def background_replace(foreground_video: str, background_video: str):
+    processes = []
+
+    # get fps and frame count
+    person_fps, person_frame_count = get_frame(foreground_video)
     print(f"fps={person_fps}, frame_count={person_frame_count}")
 
-    background_fps, background_frame_count = get_frame(background_video_file)
+    background_fps, background_frame_count = get_frame(background_video)
     print(f"fps={background_fps}, frame_count={background_frame_count}")
 
     min_frame_count = min(person_frame_count, background_frame_count)
     print(f"frame_count={min_frame_count}")
 
-    person_output_jpg = r"data\person\person\image_%04d.jpg"
-    video_image(person_video_file, person_output_jpg, min_frame_count)
+    # get foreground image from video
+    foreground_output_jpg = directory + r"\foreground\image_%04d.jpg"
+    video_image(foreground_video, foreground_output_jpg, min_frame_count)
 
-    background_output_jpg = r"data\person\background\image_%04d.jpg"
-    video_image(background_video_file, background_output_jpg, min_frame_count)
+    # get background images from video
+    background_output_jpg = directory + r"\background\image_%04d.jpg"
+    video_image(background_video, background_output_jpg, min_frame_count)
 
-    input_file = r"data\person\person\image_*.jpg"
-    output_file = r"data\person\matting\image_{id}.png"
-    matting_image(input_file, output_file)
+    # matting image
+    foreground_input_file = directory + r"\foreground\image_*.jpg"
+    matting_output_file = directory + r"\matting\image_{id}.png"
+    matting_image(foreground_input_file, matting_output_file)
 
-    matting_file = r"data\person\matting\image_*.png"
-    output_merge_file = r"data\person\merge\image_{id}.jpg"
-    merge_images(matting_file, output_merge_file)
+    # delete foreground image
+    p1 = multiprocessing.Process(target=delete_files_in_directory, args=(directory + r"\foreground",))
+    processes.append(p1)
+    p1.start()
 
-    input_images = r"data\person\merge\image_%04d.jpg"
-    output_video = r"data\person\merge.mp4"
-    merge_video(input_images, output_video)
+    # merge image
+    matting_input_file = directory + r"\matting\image_*.png"
+    merge_output_file = directory + r"\merge\image_{id}.jpg"
+    merge_images(matting_input_file, merge_output_file)
+
+    # delete background image, merge image
+    p2 = multiprocessing.Process(target=delete_files_in_directory, args=(directory + r"\background",))
+    processes.append(p2)
+    p2.start()
+
+    p3 = multiprocessing.Process(target=delete_files_in_directory, args=(directory + r"\matting",))
+    processes.append(p3)
+    p3.start()
+
+    # images to video
+    merge_input_images = directory + r"\merge\image_%04d.jpg"
+    video_output = directory + r"\merge.mp4"
+    merge_video(merge_input_images, video_output)
+
+    # delete merge image
+    p4 = multiprocessing.Process(target=delete_files_in_directory, args=(directory + r"\merge",))
+    processes.append(p4)
+    p4.start()
+
+    for p in processes:
+        p.join()
 
 
 if __name__ == '__main__':
-    main()
+    directory = r"data\person"
+    background_replace(r"data\person.mp4", r"data\background.mp4")
