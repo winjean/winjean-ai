@@ -23,9 +23,8 @@ import threading
 logger = logging.getLogger(__name__)
 
 
-def gfpgan(task_name: str, video_name: str, audio_name: str, gpu_id: str) -> str:
-    #加载GFPGAN模型###########################################################
-
+def gfpgan(task_name: str, video_name: str, audio_name: str, gpu_id: str,
+           gfpgan_upscale: int, gfpgan_version: str, sharding_count: int) -> str:
     out_path = f"./tasks/{task_name}/output"
     logger.info("加载GFPGAN模型...")
     logger.info("*" * 50)
@@ -40,12 +39,12 @@ def gfpgan(task_name: str, video_name: str, audio_name: str, gpu_id: str) -> str
 
     start_time_1 = time.time()
     # 原始视频转换为图片
-    video_to_image(input_video_path, unprocessed_frame_path)
+    video_to_image(input_video_path, unprocessed_frame_path, sharding_count)
     start_time_2 = time.time()
     print("1.原始视频转换为图片完成,耗时：", start_time_2 - start_time_1)
 
     # 原始图片转换成高清图片
-    handle_image_path(gpu_id, unprocessed_frame_path, processed_frame_path)
+    handle_image_path(gpu_id, unprocessed_frame_path, processed_frame_path, gfpgan_upscale, gfpgan_version)
     start_time_3 = time.time()
     print("2.原始图片转换成高清图片完成,耗时：", start_time_3 - start_time_2)
 
@@ -59,23 +58,25 @@ def gfpgan(task_name: str, video_name: str, audio_name: str, gpu_id: str) -> str
     start_time_5 = time.time()
     print("4.合并成一个完整的视频完成,耗时：", start_time_5 - start_time_4)
 
-    merge_video_path = os.path.join(out_path, "video.mp4")
+    merge_video_file = os.path.join(out_path, "video.mp4")
     final_processed_output_video = os.path.join(out_path, "final_video.mp4")
-    command = ("ffmpeg -y -i {} -i {} -map 0 -map 1 -c:v copy -shortest {}".
-               format(merge_video_path, input_audio_path, final_processed_output_video))
-    subprocess.call(command, shell=True)
+    merge_audio_video(input_audio_path, merge_video_file, final_processed_output_video)
     start_time_6 = time.time()
-    print("5.完成,耗时：", start_time_6 - start_time_5)
+    print("5.音频和视频合并完成,耗时：", start_time_6 - start_time_5)
 
     return os.path.abspath(final_processed_output_video)
 
 
-def super_resolution(video_path: str, audio_path: str, gpu_id: str) -> str:
+def super_resolution(video_path: str, audio_path: str, gpu_id: str,
+                     sharding_count: int = 8, gfpgan_upscale: int = 2, gfpgan_version: str = "1.3") -> str:
 
     """
-    :param video_path:
-    :param audio_path:
-    :param gpu_id:
+    :param video_path: 音频文件
+    :param audio_path: 视频文件
+    :param gpu_id: gpu编号
+    :param sharding_count: 源视频分片的数(默认值8)
+    :param gfpgan_upscale: 高分参数(默认值2)
+    :param gfpgan_version: 高分参数(默认值1.3)
     :return:
     """
     work_path = '/home/ubuntu/winjean/GFPGAN-master'
@@ -101,7 +102,7 @@ def super_resolution(video_path: str, audio_path: str, gpu_id: str) -> str:
     # 运行超分任务
     try:
         # GFPGAN
-        video_path = gfpgan(task_name, video_name, audio_name, gpu_id)
+        video_path = gfpgan(task_name, video_name, audio_name, gpu_id, gfpgan_upscale, gfpgan_version, sharding_count)
     except Exception as e:
         print(e)
         logger.error(e)
@@ -111,7 +112,8 @@ def super_resolution(video_path: str, audio_path: str, gpu_id: str) -> str:
     return video_path
 
 
-def handle_image_path(gpu_id: str, unprocessed_frame_path: str, processed_frame_path: str):
+def handle_image_path(gpu_id: str, unprocessed_frame_path: str, processed_frame_path: str,
+                      gfpgan_upscale: int, gfpgan_version: str):
     path_list = os.listdir(unprocessed_frame_path)
     path_list = sorted(path_list)
 
@@ -125,23 +127,24 @@ def handle_image_path(gpu_id: str, unprocessed_frame_path: str, processed_frame_
         input_image_abs_path = os.path.abspath(input_image_path)
         output_image_abs_path = os.path.abspath(output_image_path)
 
-        t = threading.Thread(target=handle_image, args=(gpu_id, input_image_abs_path, output_image_abs_path))
+        t = threading.Thread(target=handle_image, args=(gpu_id, input_image_abs_path, output_image_abs_path,
+                                                        gfpgan_upscale, gfpgan_version))
         threads.append(t)
         t.start()
 
     for t in threads:
         t.join(timeout=300)
-    print("handle_image_path finish")
 
 
-def handle_image(gpu_id: str, unprocessed_frames_folder_path: str, out_path: str):
+def handle_image(gpu_id: str, unprocessed_frames_folder_path: str, out_path: str,
+                 gfpgan_upscale: int, gfpgan_version: str):
     command = [
         "/home/ubuntu/GFPGAN_Project/env/bin/python",
         "/home/ubuntu/winjean/GFPGAN-master/inference_gfpgan.py",
         "-i", unprocessed_frames_folder_path,
         "-o", out_path,
-        "-v", "1.3",
-        "-s", "2",
+        "-v", gfpgan_version,
+        "-s", str(gfpgan_upscale),
         "--only_center_face",
         "--bg_upsampler", "None"
     ]
@@ -151,7 +154,7 @@ def handle_image(gpu_id: str, unprocessed_frames_folder_path: str, out_path: str
     subprocess.run(command, capture_output=True, text=True, env=env)
 
 
-def video_to_image(video_file: str, output_path: str):
+def video_to_image(video_file: str, output_path: str, sharding_count: int):
     duration = get_video_duration(video_file)
     threads = []
 
@@ -164,9 +167,8 @@ def video_to_image(video_file: str, output_path: str):
         video_to_image_with_fps(video_file, os.path.join(output_frame_path, "image_%04d.jpg"), 25)
     elif duration < 600:
         time_format = '00:{:02d}:{:02d}.00'
-        m = 8
-        for i in range(m):
-            video_to_sub_image(duration, time_format, video_file, output_path, threads, i, m)
+        for i in range(sharding_count):
+            video_to_sub_image(duration, time_format, video_file, output_path, threads, i, sharding_count)
 
         for _thread in threads:
             _thread.join(timeout=300)
@@ -182,7 +184,8 @@ def video_to_sub_image(duration: int, time_format: str, video_file: str, output_
     time_end = time_format.format(time_2 // 60, time_2 % 60)
     output_frame_path = os.path.join(output_path, "frame-{i}".format(i=str(n).zfill(2)))
     os.makedirs(output_frame_path, exist_ok=True)
-    t = threading.Thread(target=video_to_image_with_time_fps, args=(video_file, os.path.join(output_frame_path, "image_%04d.jpg"), time_start, time_end, 25))
+    t = threading.Thread(target=video_to_image_with_time_fps,
+                         args=(video_file, os.path.join(output_frame_path, "image_%04d.jpg"), time_start, time_end, 25))
     threads.append(t)
     t.start()
 
@@ -235,7 +238,9 @@ def video_to_image_with_time_fps(video_file: str, output_jpg: str, start_time: s
                       '-ss', start_time, '-to', end_time,
                       '-vf', 'fps=' + str(fps),
                       output_jpg]
-    subprocess.call(ffmpeg_command)
+    result = subprocess.run(ffmpeg_command, capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"将视频 {video_file} 转换为图片时出错：{result.stderr}")
 
 
 def merge_image_path_to_video(image_list_path: str, output_video: str):
@@ -262,7 +267,9 @@ def merge_video(input_images: str, output_video: str, fps: int):
                       '-r', str(fps),  # 帧率，可以根据需要调整
                       # '-c:v', 'libx264',  # 指定视频编解码器使用 libx264 编码
                       output_video]
-    subprocess.call(ffmpeg_command)
+    result = subprocess.run(ffmpeg_command, capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"将图片{input_images}合成视频时出错：{result.stderr}")
 
 
 # 获取带拼接视频列表
@@ -291,7 +298,26 @@ def concatenate_videos(video_files: str, output_file: str):
     ]
 
     # 调用 ffmpeg 命令
-    subprocess.call(ffmpeg_command)
+    result = subprocess.run(ffmpeg_command, capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"拼接视频{list_file_path}时出错：{result.stderr}")
+
+
+def merge_audio_video(input_audio_file: str, input_video_file: str, final_processed_output_video: str):
+    command = [
+        "ffmpeg",
+        "-y",
+        "-i", input_video_file,
+        "-i", input_audio_file,
+        "-map", "0",
+        "-map", "1",
+        "-c:v", "copy",
+        "-shortest",
+        final_processed_output_video
+    ]
+    result = subprocess.run(command, capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"将视频{input_video_file}和音频{input_audio_file}合并时出错：{result.stderr}")
 
 
 if __name__ == '__main__':
@@ -299,5 +325,5 @@ if __name__ == '__main__':
     vp = "/home/ubuntu/winjean/GFPGAN-master/input_audio.mp4"
     ap = "/home/ubuntu/winjean/GFPGAN-master/input_audio.wav"
     result_path = super_resolution(vp, ap, "0")
-    print(result_path)
+    print(f"处理后视频输出路径：{result_path}")
     print("耗时：", time.time() - start_time)
