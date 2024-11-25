@@ -6,10 +6,10 @@ from torch.utils.data import DataLoader, Dataset
 
 # 定义数据集
 class TextDataset(Dataset):
-    def __init__(self, texts, labels, tokenizer, max_len):
-        self.texts = texts
-        self.labels = labels
-        self.tokenizer = tokenizer
+    def __init__(self, _texts, _labels, _tokenizer, max_len):
+        self.texts = _texts
+        self.labels = _labels
+        self.tokenizer = _tokenizer
         self.max_len = max_len
 
     def __len__(self):
@@ -43,8 +43,8 @@ class BertClassifier(nn.Module):
         self.dropout = nn.Dropout(0.3)
         self.out = nn.Linear(bert_model.config.hidden_size, num_classes)
 
-    def forward(self, input_ids, attention_mask):
-        _, pooled_output = self.bert(input_ids=input_ids, attention_mask=attention_mask)
+    def forward(self, _input_ids, _attention_mask):
+        _, pooled_output = self.bert(input_ids=_input_ids, attention_mask=_attention_mask)
         output = self.dropout(pooled_output)
         return self.out(output)
 

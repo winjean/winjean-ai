@@ -40,7 +40,9 @@ ffmpeg -h 查看详细说明
     -vf crop=<width>:<height>:<x>:<y>: 裁剪视频
         ffmpeg -i input.mp4 -vf "crop=640:480:0:0" output.mp4
     -vf "movie=watermark.png [watermark]; [in][watermark] overlay=W-w-10:H-h-10 [out]"：添加水印
-         ffmpeg -i input.mp4 -vf "movie=watermark.png [watermark]; [in][watermark] overlay=W-w-10:H-h-10 [out]" output.mp4     
+        ffmpeg -i input.mp4 -vf "movie=watermark.png [watermark]; [in][watermark] overlay=W-w-10:H-h-10 [out]" output.mp4
+        "subtitles=subtitles.srt"：添加字幕      
+        ffmpeg -i input_video.mp4 -vf "subtitles=subtitles.srt:force_style='FontName=Arial,FontSize=24,PrimaryColour=&H00FF0000&'" -c:a copy output_video.mp4          
     -ab 128k：设置音频比特率为 128 kbps
     -ac <channels>: 设置音频通道数。  例如 -ac 2
         ffmpeg -i input.mp4 -ac 2 output.mp4

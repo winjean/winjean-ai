@@ -14,13 +14,13 @@
     适用场景：回归任务，对异常值不敏感。  
     特点：计算简单，对所有误差一视同仁。  
 * 交叉熵损失（Cross-Entropy Loss）  
-  * 二分类交叉熵：  
-  公式：[ \text{Binary Cross-Entropy} = -\frac{1}{n} \sum_{i=1}^{n} [y_i \log(\hat{y}_i) + (1 - y_i) \log(1 - \hat{y}_i)]]  
-  适用场景：二分类任务。  
-  * 多分类交叉熵：  
-  公式：[ \text{Categorical Cross-Entropy} = -\frac{1}{n} \sum_{i=1}^{n} \sum_{j=1}^{m} y_{ij} \log(\hat{y}_{ij}) ]
-  适用场景：多分类任务。  
-  特点：适用于概率输出，能够有效处理类别不平衡问题。   
+  - 二分类交叉熵：  
+    公式：[ \text{Binary Cross-Entropy} = -\frac{1}{n} \sum_{i=1}^{n} [y_i \log(\hat{y}_i) + (1 - y_i) \log(1 - \hat{y}_i)]]  
+    适用场景：二分类任务。  
+  - 多分类交叉熵：  
+    公式：[ \text{Categorical Cross-Entropy} = -\frac{1}{n} \sum_{i=1}^{n} \sum_{j=1}^{m} y_{ij} \log(\hat{y}_{ij}) ]
+    适用场景：多分类任务。  
+    特点：适用于概率输出，能够有效处理类别不平衡问题。   
 * 合页损失（Hinge Loss）  
     公式：[ \text{Hinge Loss} = \max(0, 1 - y_i \cdot \hat{y}_i) ]  
     适用场景：支持向量机（SVM）等分类任务。  

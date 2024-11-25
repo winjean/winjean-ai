@@ -14,7 +14,7 @@ https://github.com/open-webui/open-webui
   https://www.langchain.asia/
   https://langchain.com/
   https://www.langchain.cn/
-  https://python.langchain.com/en/latest/
+  https://python.langchain.com/docs/introduction/
   https://blog.langchain.dev/
   https://www.langchain.com.cn/
   https://blog.csdn.net/wenxingchen?type=blog
@@ -43,3 +43,6 @@ https://mirrors.tuna.tsinghua.edu.cn/
 
 * conda  
 https://docs.conda.io/projects/conda/en/stable/index.html
+
+* 音色克隆
+https://www.yuque.com/baicaigongchang1145haoyuangong/ib3g1e
