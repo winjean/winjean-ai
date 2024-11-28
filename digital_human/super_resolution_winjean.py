@@ -8,7 +8,9 @@
 @Software: PyCharm
 @Desc:
 超分辨率重建
+githup地址 https://github.com/TencentARC/GFPGAN
 """
+
 
 import os
 import subprocess
@@ -74,9 +76,9 @@ def super_resolution(video_path: str, audio_path: str, gpu_id: str,
     :param video_path: 音频文件
     :param audio_path: 视频文件
     :param gpu_id: gpu编号
-    :param sharding_count: 源视频分片的数(默认值8)
-    :param gfpgan_upscale: 高分参数(默认值2)
-    :param gfpgan_version: 高分参数(默认值1.3)
+    :param sharding_count: 源视频分片的数(默认值：8)
+    :param gfpgan_upscale: 高分参数(默认值：2)
+    :param gfpgan_version: 高分参数(默认值：1.3)
     :return:
     """
     work_path = '/home/ubuntu/winjean/GFPGAN-master'
@@ -85,7 +87,7 @@ def super_resolution(video_path: str, audio_path: str, gpu_id: str,
     audio_name = audio_path.split("/")[-1]
     current_path = os.getcwd()
     os.chdir(work_path)
-    #
+
     # # 创建task_dir
     task_dir = os.path.join(work_path, "tasks", task_name)
     os.makedirs(task_dir, exist_ok=True)
