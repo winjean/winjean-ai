@@ -1,4 +1,4 @@
-* github 地址
+* 音色克隆github 地址
 https://github.com/RVC-Boss/GPT-SoVITS
 
 * 训练和微调
