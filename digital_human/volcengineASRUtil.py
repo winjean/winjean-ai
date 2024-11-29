@@ -22,7 +22,7 @@ import requests
 import cv2
 base_url = 'https://openspeech.bytedance.com/api/v1/vc/ata'
 appid = "4565900214"
-access_token = "gMFujoojCvqipnvQtso4ODVDwpc_lDGl"
+access_token = "gMFujoojCvqipnvQtso4ODVDwpc_lDGl0825"
 def get_video_ratio(video_file):
     # 打开视频文件
     cap = cv2.VideoCapture(video_file)
