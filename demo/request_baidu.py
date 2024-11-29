@@ -1,5 +1,5 @@
 import requests
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup
 from langchain.tools.base import BaseTool
 from langchain.agents import (
     AgentExecutor,
@@ -26,19 +26,19 @@ class BaiduSearchTool(BaseTool):
     description = "Useful for when you need to answer questions about current events or the latest information."
 
     def _run(self, query: str):
-        url = f"https://www.baidu.com/s?wd={query}"
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'html.parser')
+        # url = f"https://www.baidu.com/s?wd={query}"
+        # response = requests.get(url)
+        # soup = BeautifulSoup(response.text, 'html.parser')
+        #
+        # # 解析搜索结果
+        # results = []
+        # for result in soup.find_all('div', class_='result c-container'):
+        #     title = result.find('h3').text
+        #     link = result.find('a')['href']
+        #     snippet = result.find('div', class_='c-abstract').text if result.find('div', class_='c-abstract') else ''
+        #     results.append({"title": title, "link": link, "snippet": snippet})
 
-        # 解析搜索结果
-        results = []
-        for result in soup.find_all('div', class_='result c-container'):
-            title = result.find('h3').text
-            link = result.find('a')['href']
-            snippet = result.find('div', class_='c-abstract').text if result.find('div', class_='c-abstract') else ''
-            results.append({"title": title, "link": link, "snippet": snippet})
-
-        return results
+        return None
 
     def _arun(self, query: str):
         raise NotImplementedError("This tool does not support async")

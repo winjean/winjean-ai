@@ -1,5 +1,6 @@
 import numpy as np
-
+import cv2
+"""
 # 创建两个矩阵
 A = np.array([[1, 2], [3, 4]])
 B = np.array([[5, 6], [7, 8]])
@@ -29,4 +30,14 @@ print(A.T)
 # 输出:
 # [[1 3]
 #  [2 4]]
+"""
+a=np.random.randint(0, 255, 600*800*3)
+b=a.reshape(600, 800, 3)
+cv2.imwrite(r"image0.jpg", b)
 
+c=np.full((20, 600, 800, 3), 0)
+print(c.shape)
+c[1, :] = b
+cv2.imwrite(r"image1.jpg", c[1])
+c[2, :] = np.full((600, 800, 3), 255);
+cv2.imwrite(r"image2.jpg", c[2])

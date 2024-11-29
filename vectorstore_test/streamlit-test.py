@@ -2,7 +2,7 @@ import streamlit
 import pandas
 
 # 使用方法
-# streamlit run vectorstore_test/streamlit-test.py
+# streamlit run vectorstore_test/streamlit-feed_forward.py
 #
 
 streamlit.set_page_config(

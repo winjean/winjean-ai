@@ -2,6 +2,10 @@ import pyttsx3
 import wave
 import struct
 
+"""
+windows、linux、mac需要安装不同的语音引擎
+"""
+
 def on_start(name):
     print(f"Starting: {name}")
 

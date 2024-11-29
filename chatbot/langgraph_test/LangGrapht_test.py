@@ -63,7 +63,7 @@ class AgentState_chatmodel(TypedDict):
 
 
 
-os.environ["moonshot_api_key"]="sk-"
+os.environ["moonshot_api_key"]="sk-eJ55Ld7u8mu42HK1gqF6C8VRIknLjIGH4ZWXOLUMG14ip0Yl"
 os.environ["model_name"]="moonshot-v1-8k"
 os.environ["api_base_url"]="https://api.moonshot.cn/v1"
 
@@ -155,6 +155,7 @@ agent_runnable = create_structured_chat_agent(llm=model, tools=tools, prompt=pro
 
 # print(model.invoke("1+1等于"))
 
+
 # 定义agent
 def run_agent(data):
     # 调用agent可执行对象，并传入数据
@@ -162,7 +163,6 @@ def run_agent(data):
     # agent_outcome = {"tool":"返回0-100之间的随机数"}
     # 返回代理的结果
     return {"agent_outcome": agent_outcome}
-
 
 
 # 定义执行工具的函数
@@ -196,6 +196,7 @@ def should_continue(data):
     else:
         return "continue"
 
+
 ####################################初始化一个stategraph##############################
 class AgentState(TypedDict):
     # 定义一些初始化的功能
@@ -208,6 +209,7 @@ class AgentState(TypedDict):
     # 动作列表和相应的观察结果
     # operator.add表明对这个状态的操作是添加到现有值上而不是覆盖掉
     intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
+
 
 #######################################################定义一个新的图（工作流）##################################################
 workflow = StateGraph(AgentState)  # agentstate是上面初始化过的一个stategraph

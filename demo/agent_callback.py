@@ -22,7 +22,8 @@ chain.invoke({"number": 2})
 
 # 请求回调：最后，让我们使用请求`callbacks`来达到相同的结果
 chain = LLMChain(llm=llm, prompt=prompt)
-chain.invoke({"number": 2}, {"callbacks": [handler]})
+a = chain.invoke({"number": 2}, {"callbacks": [handler]})
+print()
 
 if __name__ == '__main__':
     pass
