@@ -4,12 +4,13 @@ from langchain.prompts import (
     MessagesPlaceholder,
 )
 from langchain_core.messages import SystemMessage
+from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_openai import ChatOpenAI
-from langchain.chains import LLMChain
-from langchain.memory import ConversationBufferMemory
+from langchain_community.chat_message_histories import ChatMessageHistory
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
+store = {}
 
 prompt = ChatPromptTemplate.from_messages(
     [
@@ -20,23 +21,46 @@ prompt = ChatPromptTemplate.from_messages(
             variable_name="chat_history"
         ),  # 存储Memory的位置
         HumanMessagePromptTemplate.from_template(
-            "{human_input}"
+            "{message}"
         ),  # 将人类输入注入的位置
     ]
 )
 
-memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
-llm = ChatOpenAI()
+def get_session_history(session_id: str):
+    if session_id not in store:
+        store[session_id] = ChatMessageHistory(memory_key="chat_history", return_messages=True)
+    return store[session_id]
 
-chat_llm_chain = LLMChain(
-    llm=llm,
-    prompt=prompt,
-    verbose=True,
-    memory=memory,
+memory = ChatMessageHistory(memory_key="chat_history", return_messages=True)
+memory.add_ai_message("aaaa")
+memory.add_user_message("bbbb")
+store["123456"] = memory
+
+llm = ChatOpenAI(
+    temperature=0.95,
+    model="glm-4-flash",
 )
 
-chat_llm_chain.predict(human_input="嗨，朋友")
+chat_llm_chain = prompt | llm
+
+# response = chat_llm_chain.invoke({"chat_history": memory.messages, "message": "嗨，朋友,刚才你说了什么"})
+# print(response)
+
+
+with_message_history = RunnableWithMessageHistory(
+    chat_llm_chain,
+    get_session_history,
+    input_messages_key="message",
+    history_messages_key="chat_history",
+)
+
+response = with_message_history.invoke(
+    {"message": "嗨，朋友,刚才你说了什么"},
+    {"configurable": {"session_id": "123456"}},
+)
+
+print(response.content)
 
 if __name__ == '__main__':
     pass
