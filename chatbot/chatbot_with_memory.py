@@ -5,9 +5,11 @@ from langchain.prompts import (
 )
 from langchain_core.messages import SystemMessage
 from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
 from langchain_community.chat_message_histories import ChatMessageHistory
 from dotenv import load_dotenv, find_dotenv
+
 
 load_dotenv(find_dotenv())
 store = {}
@@ -42,7 +44,9 @@ llm = ChatOpenAI(
     model="glm-4-flash",
 )
 
-chat_llm_chain = prompt | llm
+parser = StrOutputParser()
+
+chat_llm_chain = prompt | llm | parser
 
 # response = chat_llm_chain.invoke({"chat_history": memory.messages, "message": "嗨，朋友,刚才你说了什么"})
 # print(response)
@@ -59,8 +63,9 @@ response = with_message_history.invoke(
     {"message": "嗨，朋友,刚才你说了什么"},
     {"configurable": {"session_id": "123456"}},
 )
+print(response)
 
-print(response.content)
 
 if __name__ == '__main__':
-    pass
+    ...
+
