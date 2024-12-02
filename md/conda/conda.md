@@ -16,6 +16,10 @@ conda config --remove channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkg
 conda create --name [env-name]: 创建一个新的环境。
 conda create -n test pyton==3.9
 
+指定环境路径
+conda create --prefix /home/ubuntu/winjean/GPTSoVits python=3.9
+conda config --append envs_dirs /home/ubuntu/winjean
+
 conda activate [env-name]: 激活指定环境。
 
 conda deactivate: 退出当前环境。
