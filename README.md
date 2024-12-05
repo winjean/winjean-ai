@@ -1,3 +1,6 @@
+## 大模型知识库
+https://github.com/liguodongiot/llm-action/tree/main?tab=readme-ov-file
+
 * 千问大语言模型地址  
 https://github.com/QwenLM
 
