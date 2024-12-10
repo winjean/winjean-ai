@@ -63,7 +63,7 @@ class AgentState_chatmodel(TypedDict):
 
 
 
-os.environ["moonshot_api_key"]="sk-eJ55Ld7u8mu42HK1gqF6C8VRIknLjIGH4ZWXOLUMG14ip0Yl"
+os.environ["moonshot_api_key"]="sk-wineJ55Ld7u8mu42HK1gqF6C8VRIknLjIGH4ZWXOLUMG14ip0Yl0825"
 os.environ["model_name"]="moonshot-v1-8k"
 os.environ["api_base_url"]="https://api.moonshot.cn/v1"
 
