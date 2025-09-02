@@ -88,7 +88,8 @@ for epoch in range(3):
 # 保存模型
 # 保存模型和相关配置
 model_info = {
-    'state_dict': model.state_dict(),
+    'model_state_dict': model.state_dict(),
+    'optimizer_state_dict': optimizer.state_dict(),
     'num_classes': 2,
     'max_len': 128,
     'model_name': 'bert-base-uncased'
