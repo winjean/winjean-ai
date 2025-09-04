@@ -37,3 +37,7 @@ kubectl get events --sort-by=.metadata.creationTimestamp
 # 检查资源使用情况
 kubectl top node
 kubectl top pod
+
+
+kubelet、kube-proxy
+node pod service events
